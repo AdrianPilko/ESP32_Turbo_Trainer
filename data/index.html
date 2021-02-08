@@ -1,0 +1,252 @@
+<html>
+
+<head>
+  <title>Turbo Trainer</title>  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <link rel="icon" href="data:,">
+  <style>
+    html {font-family: Arial; display: inline-block; text-align: center;}
+    h2 {font-size: 3.0rem;}
+    p {font-size: 3.0rem;}
+    body {max-width: 600px; margin:0px auto; padding-bottom: 25px;}
+    .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
+    .switch input {display: none}
+    .slider {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 6px}
+    .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 3px}
+    input:checked+.slider {background-color: #b30000}
+    input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
+  </style>
+</head>
+<body>
+  <h2>Adrian's Turbo Trainer</h2>
+
+    <h4>Load settings</h4><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="25"><span class="slider"></span></label>
+    <label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="26"><span class="slider"></span></label>
+    <label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="27"><span class="slider"></span></label>
+    <label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="14"><span class="slider"></span></label>
+	<h4>Exercise Program</h4><label class="switch"><input type="checkbox" onchange="toggleEXCheckbox(this)" id="prog1"><span class="slider"></span></label>
+	<p style="font-size:80%;" id="temperature">temperature =unset</p>
+	<p style="font-size:80%;" id="volts">voltage =unset</p>
+	<p style="font-size:80%;" id="currentMaxPower">Max Power (this run) =unset</p>
+	<p style="font-size:80%;" id="previousMaxes">max list:unset</p>
+	<div id="chart-power" class="container"></div>
+	
+<script>
+function toggleCheckbox(element) {
+  var xhr = new XMLHttpRequest();
+  if(element.checked){ xhr.open("GET", "/update?output="+element.id+"&state=1", true); }
+  else { xhr.open("GET", "/update?output="+element.id+"&state=0", true); }
+  xhr.send();
+}
+function toggleEXCheckbox(element) {
+  var xhr = new XMLHttpRequest();
+  if(element.checked){ xhr.open("GET", "/prog1?output="+element.id+"&state=1", true); }
+  else { xhr.open("GET", "/prog1?output="+element.id+"&state=0", true); }
+  xhr.send();
+}
+
+setInterval(function ( ) {
+  // Get the checkbox
+  var checkBox = document.getElementById("25");
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var y = this.responseText;
+      console.log(this.responseText);
+      if(y == "checked") 
+	  {
+	      checkBox.checked = true;
+	  }
+	  else
+	  {
+	      checkBox.checked = false;
+	  }
+    }
+  };
+  xhttp.open("GET", "/25", false);
+  xhttp.send();
+}, 3000 ) ;
+
+setInterval(function ( ) {
+  // Get the checkbox
+  var checkBox = document.getElementById("26");
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var y = this.responseText;
+      console.log(this.responseText);
+      if(y == "checked") 
+	  {
+	      checkBox.checked = true;
+	  }
+	  else
+	  {
+	      checkBox.checked = false;
+	  }
+    }
+  };
+  xhttp.open("GET", "/26", false);
+  xhttp.send();
+}, 3001 ) ;
+
+setInterval(function ( ) {
+  // Get the checkbox
+  var checkBox = document.getElementById("27");
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var y = this.responseText;
+      console.log(this.responseText);
+      if(y == "checked") 
+	  {
+	      checkBox.checked = true;
+	  }
+	  else
+	  {
+	      checkBox.checked = false;
+	  }
+    }
+  };
+  xhttp.open("GET", "/27", false);
+  xhttp.send();
+}, 3003 ) ;
+
+setInterval(function ( ) {
+  // Get the checkbox
+  var checkBox = document.getElementById("14");
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var y = this.responseText;
+      console.log(this.responseText);
+      if(y == "checked") 
+	  {
+	      checkBox.checked = true;
+	  }
+	  else
+	  {
+	      checkBox.checked = false;
+	  }
+    }
+  };
+  xhttp.open("GET", "/14", false);
+  xhttp.send();
+}, 3004 ) ;
+
+setInterval(function ( ) {
+  // Get the checkbox
+  var checkBox = document.getElementById("prog1");
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var y = this.responseText;
+      console.log(this.responseText);
+      if(y == "checked") 
+	  {
+	      checkBox.checked = true;
+	  }
+	  else
+	  {
+	      checkBox.checked = false;
+	  }
+    }
+  };
+  xhttp.open("GET", "/exProg", false);
+  xhttp.send();
+}, 3005 ) ;
+
+setInterval(function ( ) {
+  // update temperature
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      console.log(this.responseText);
+      document.getElementById("temperature").innerHTML = "temperature=" + this.responseText;
+    }
+  };
+  xhttp.open("GET", "/temperature", false);
+  xhttp.send();
+}, 5001) ;
+
+setInterval(function ( ) {
+  // update temperature
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      console.log(this.responseText);
+      document.getElementById("volts").innerHTML = "voltage=" + this.responseText;
+    }
+  };
+  xhttp.open("GET", "/volts", false);
+  xhttp.send();
+}, 4001) ;
+
+setInterval(function ( ) {
+  // update currentMaxPower
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      console.log(this.responseText);
+      document.getElementById("currentMaxPower").innerHTML = "Max Power (this run) =" + this.responseText;
+    }
+  };
+  xhttp.open("GET", "/currentMax", false);
+  xhttp.send();
+}, 4003) ;
+
+
+setInterval(function ( ) {
+  // update currentMaxPower
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      console.log(this.responseText);
+      document.getElementById("previousMaxes").innerHTML = "max list:" + this.responseText;
+    }
+  };
+  xhttp.open("GET", "/previousMaxes", false);
+  xhttp.send();
+}, 4009) ;
+
+
+var chartT = new Highcharts.Chart({
+  chart:{ renderTo : 'chart-power' },
+  title: { text: 'Power graph' },
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+  plotOptions: {
+    line: { animation: false,
+      dataLabels: { enabled: true }
+    },
+    series: { color: '#059e8a' }
+  },
+  xAxis: { type: 'datetime',
+    dateTimeLabelFormats: { second: '%H:%M:%S' }
+  },
+  yAxis: {
+    title: { text: 'Power (Watts)' }
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime(),
+          y = parseFloat(this.responseText);
+      if(chartT.series[0].data.length > 100) {
+        chartT.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartT.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/power", true);
+  xhttp.send();
+}, 2500 ) ;
+</script>
+</body>
+</html>
