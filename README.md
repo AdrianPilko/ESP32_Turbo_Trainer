@@ -5,7 +5,7 @@ Background
 ==========
 A turbo trainer is used to convert temporarily a normal bicycle into a static exercise bike
 
-The turbo trainer used here came from Decathlon (called InRide) had just a magnetic resistance to make it harder or easier to pedal. My upgrade to this involved removing the magnetic resistance and installing a brushless outrigger motor/generator, attached to a board with a bank of 4 and 8 ohm power resistors and a 3 phase full bridge recifier. The resistor bank is switch in and out using a relay block controlled from the ESP32 microcontroller.
+The turbo trainer used here came from Decathlon (called InRide) had just a magnetic resistance to make it harder or easier to pedal. My upgrade to this involved removing the magnetic resistance and installing a brushless outrigger motor/generator, attached to a board with a bank of 4 and 8 ohm power resistors and a 3 phase full bridge rectifier. The resistor bank is switch in and out using a relay block controlled from the ESP32 microcontroller.
 
 Parts list
 ==========
