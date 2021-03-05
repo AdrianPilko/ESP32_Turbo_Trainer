@@ -27,7 +27,11 @@ DHT dht(DHTPIN, DHTTYPE);
 #define RELAY_4_PIN 14
 #define VOLTAGE_PIN 36
 #define TEMP_SHUTDOWN_THRESHOLD 59
+#define MINIMUM_RESISTOR_ALWAYS_CONNECTED (4.0)
 #define NUM_MAXES 10
+#define MINIMUM_POWER_TO_WRITE_TO_FILE 100
+#define R1_VAL (4.0)
+#define R2_VAL (8.0)
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -103,7 +107,7 @@ int readPowerMaxData()
   powerFile.close();
 }
 
-int writeMaxPower()
+int writeMaxPower(float maxPower)
 {
   // open the power leader board file, with FILE_WRITE which should replace existing file
   File powerFile = SPIFFS.open("/powerMax.txt", FILE_WRITE);
@@ -124,16 +128,16 @@ int writeMaxPower()
         Serial.print(" i=");
         Serial.println(i);
      }
-     leaderStringArray[NUM_MAXES-1] = maxPowerThisRun;
+     leaderStringArray[NUM_MAXES-1] = maxPower;
      numLines = NUM_MAXES;
   }
   else
   {
-    Serial.print("maxPowerThisRun=");
-    Serial.print(maxPowerThisRun);
+    Serial.print("maxPower=");
+    Serial.print(maxPower);
     Serial.print(" added at index=");
     Serial.println(numLines+1);
-    leaderStringArray[numLines+1] = maxPowerThisRun;
+    leaderStringArray[numLines+1] = maxPower;
     numLines += 1;
   }
   
@@ -145,6 +149,20 @@ int writeMaxPower()
      Serial.println(leaderStringArray[i]);
   }
   powerFile.close();
+}
+
+bool maxInCurrentLeaderList(float maxBiggerCurrentLeaderList)
+{
+  bool argBiggerThanAllCurrent = false;
+  
+  for (int i = 0; i < numLines; i++)
+  { 
+     if (maxBiggerCurrentLeaderList > (leaderStringArray[i].toInt()))
+     {
+       argBiggerThanAllCurrent = true;
+     }
+  }  
+  return argBiggerThanAllCurrent;
 }
 
 String constructStringFromCurrentList()
@@ -289,10 +307,13 @@ void loop()
 {
   float tem = dht.readTemperature();
 
+  Serial.print("temperature=");
+  Serial.println(tem);
   if (isnan(tem))
   {
     tem = 0;
   }
+  
   //shutdown relays at threshold
   if (tem > TEMP_SHUTDOWN_THRESHOLD)
   {
@@ -325,23 +346,23 @@ void loop()
   float R3 = digitalRead(RELAY_3_PIN);
   float R4 = digitalRead(RELAY_4_PIN);
 
-  float recip_totalR = 0.0;
+  float recip_totalR = 1.0 / MINIMUM_RESISTOR_ALWAYS_CONNECTED; // ////// always have the 4.0 ohm resistor in 
 
   if (R1 != 0) // check to avoid div by zero
   {
-    recip_totalR = (1.0 / (R1 * 4.0));
+    recip_totalR += (1.0 / (R1 * R1_VAL));
   }
   if (R2 != 0) // check to avoid div by zero
   {
-    recip_totalR += (1.0 / (R2 * 4.0));
+    recip_totalR += (1.0 / (R2 * R1_VAL));
   }
   if (R3 != 0) // check to avoid div by zero
   {
-    recip_totalR += (1.0 / (R3 * 8.0));
+    recip_totalR += (1.0 / (R3 * R2_VAL));
   }
   if (R4 != 0) // check to avoid div by zero
   {
-    recip_totalR += (1.0 / (R4 * 8.0));
+    recip_totalR += (1.0 / (R4 * R2_VAL));
   }
 
   //P=IV, V=IR, I=V/R, P=(V/R)*V
@@ -356,7 +377,10 @@ void loop()
     // write the max power to the file
     Serial.print("Max Power now=");
     Serial.println(maxPowerThisRun);
-    writeMaxPower();
+    if ((maxPowerThisRun > MINIMUM_POWER_TO_WRITE_TO_FILE) && (maxInCurrentLeaderList(maxPowerThisRun)))
+    { 
+       writeMaxPower(maxPowerThisRun);
+    }
   }
   maxPowerThisRunStr = maxPowerThisRun;
 
