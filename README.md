@@ -10,7 +10,7 @@ The turbo trainer used here came from Decathlon (called InRide) had just a magne
 Todo
 ====
 1) add a wheel speed sensor, this will open up a few extra things like total distance travelled
-2) change power calculation to use amp sensor, rather thqn measured voltage and in circuit resistnance
+2) change power calculation to use amp sensor, rather than measured voltage and in circuit resistnance
 3) make the max power history only update the max for the run if greater than the smallest, and also sort the list in descending order
 4) improve web page with colour, and extra features like a side scrolling graphic showing a bike riding along a road which changes in gradient with the resistance, and the speed the "scenary" move at determined by rear wheel rpm... basically a poor mans zwift lol
 
