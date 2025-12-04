@@ -61,8 +61,8 @@ void setup()
 
 void loop()
 {
-  print(inExerciseProgCounter);
-  print(" ");
+  Serial.print(inExerciseProgCounter);
+  Serial.print(" ");
   // inExerciseProg causes the relays to be set in a predefined sequence
   if (inExerciseProg == true)
   {
